@@ -1,3 +1,5 @@
+const forceUpdateButton = document.getElementById("forceUpdate");
+
 async function clearCache() {
   if ("caches" in window) {
     const cacheNames = await caches.keys();
@@ -13,3 +15,6 @@ function handleKeyRelease(event) {
 }
 
 document.addEventListener("keyup", handleKeyRelease);
+forceUpdateButton.addEventListener("click", () => {
+  clearCache();
+});
