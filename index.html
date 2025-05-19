@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <base href="." />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="og:title" content="Chatlantis" />
+    <meta name="og:type" content="website" />
+    <meta name="og:image" content="assets/og-image.jpeg" />
+    <meta name="og:description" content="Description" />
+
+    <title>Chatlantis</title>
+    <link rel="icon" href="assets/favicon.png" type="image/png" />
+
+    <link rel="stylesheet" href="src/main.css" />
+  </head>
+
+  <body>
+    <div class="grid">
+      <div class="container" id="messagesContainer">
+        <div id="messages"></div>
+
+        <div id="inputContainer">
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Type something..."
+            disabled
+          />
+          <button id="sendMessage" disabled>Send</button>
+        </div>
+      </div>
+
+      <div class="container" id="userContainer">
+        <div id="signedOut">
+          <button id="signInGoogle">Sign in with Google</button>
+        </div>
+
+        <div id="signedIn">
+          <button id="signOut">Sign out</button>
+
+          <div id="nicknameWrapper">
+            <input type="text" id="nicknameInput" />
+            <button id="updateNickname">Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="src/main.js"></script>
+    <script type="module" src="src/firebase-backend.js"></script>
+    <script type="module" src="src/firebase-frontend.js"></script>
+    <script src="https://abnormalnormality.github.io/Scripts-and-Pieces/scripts/update.js"></script>
+  </body>
+</html>
