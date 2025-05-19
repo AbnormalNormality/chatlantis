@@ -64,6 +64,9 @@ async function handleUser(user) {
 
   const userData = await getUserData(user.uid);
 
+  if (!userData.nickname) {
+    userData.nickname == "Anonymous";
+  }
   nicknameInput.placeholder = userData.nickname;
 
   // if (unsubscribeMessages) unsubscribeMessages();
