@@ -108,6 +108,7 @@ body {
 
 #updateNickname {
   width: 16.25%;
+  font-size: 0.5vw;
 }
 
 #nicknameInput {

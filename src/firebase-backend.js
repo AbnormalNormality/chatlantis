@@ -55,12 +55,7 @@ async function signOutUser() {
 
 function listenMessages(callback) {
   return onSnapshot(messagesQuery, (snapshot) => {
-    const messages = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      timestamp: doc.data().timestamp?.toDate(),
-    }));
-    callback(messages);
+    callback();
   });
 }
 
@@ -101,13 +96,7 @@ async function handleUser(user) {
 
 function listenToUpdateTrigger(callback) {
   async function fetchMessagesAndRunCallback() {
-    const snapshot = await getDocs(messagesQuery);
-    const messages = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      timestamp: doc.data().timestamp?.toDate(),
-    }));
-    callback(messages);
+    callback();
   }
 
   const updateDocRef = doc(db, "dev", "update");
@@ -123,6 +112,16 @@ async function triggerUpdate() {
   });
 }
 
+async function getMessages() {
+  const snapshot = await getDocs(messagesQuery);
+  const messages = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    timestamp: doc.data().timestamp?.toDate(),
+  }));
+  return messages;
+}
+
 export {
   signInWith,
   onAuthStateChange,
@@ -134,4 +133,5 @@ export {
   setUserData,
   listenToUpdateTrigger,
   triggerUpdate,
+  getMessages,
 };

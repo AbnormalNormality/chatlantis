@@ -9,6 +9,7 @@ import {
   setUserData,
   listenToUpdateTrigger,
   triggerUpdate,
+  getMessages,
 } from "./firebase-backend.js";
 
 const signedInDiv = document.getElementById("signedIn");
@@ -23,7 +24,6 @@ const updateNicknameButton = document.getElementById("updateNickname");
 const messageInput = document.getElementById("messageInput");
 const nicknameInput = document.getElementById("nicknameInput");
 
-let unsubscribeMessages = null;
 let sending = false;
 let renaming = false;
 let updating = false;
@@ -68,12 +68,9 @@ async function handleUser(user) {
     userData.nickname == "Anonymous";
   }
   nicknameInput.placeholder = userData.nickname;
-
-  // if (unsubscribeMessages) unsubscribeMessages();
-  // unsubscribeMessages = listenMessages(displayMessages);
 }
 
-async function displayMessages(messages) {
+async function displayMessages() {
   if (updating) return;
   updating = true;
 
@@ -84,6 +81,7 @@ async function displayMessages(messages) {
       messagesDiv.clientHeight <
     nearBottomThreshold;
 
+  const messages = await getMessages();
   const sortedMessages = [...messages].slice(-50);
 
   const authorIds = [...new Set(sortedMessages.map((msg) => msg.authorid))];
@@ -247,8 +245,8 @@ nicknameInput.addEventListener("keydown", async (event) => {
   }
 });
 
-async function forcedUpdate(messages) {
-  await displayMessages(messages);
+async function forcedUpdate() {
+  await displayMessages();
 }
 
 updateNicknameButton.addEventListener("click", async () => {
@@ -256,6 +254,6 @@ updateNicknameButton.addEventListener("click", async () => {
 });
 
 listenToUpdateTrigger(forcedUpdate);
-unsubscribeMessages = listenMessages(displayMessages);
+listenMessages(displayMessages);
 
 onAuthStateChange(handleUser);
