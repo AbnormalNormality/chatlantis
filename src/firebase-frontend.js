@@ -213,7 +213,11 @@ async function displayMessages() {
   const lastStoredMessage = localStorage.getItem("lastMessage");
   const lastMessage = sortedMessages[sortedMessages.length - 1];
 
-  if (lastMessage && lastStoredMessage !== lastMessage.id) {
+  if (
+    lastMessage &&
+    lastMessage.authorid != getUser().uid &&
+    lastStoredMessage !== lastMessage.id
+  ) {
     notify(`${userDataMap[lastMessage.authorid].nickname} sent a message!`);
     localStorage.setItem("lastMessage", lastMessage.id);
   }
