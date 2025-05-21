@@ -18,6 +18,7 @@ import {
 const signedInDiv = document.getElementById("signedIn");
 const signedOutDiv = document.getElementById("signedOut");
 const messagesDiv = document.getElementById("messages");
+const devDiv = document.getElementById("dev");
 
 const siGoogleButton = document.getElementById("signInGoogle");
 const signOutButton = document.getElementById("signOut");
@@ -66,6 +67,7 @@ function signedOut() {
   signedOutDiv.style.display = "flex";
   messageInput.disabled = true;
   sendMessageButton.disabled = true;
+  devDiv.style.display = "none";
 }
 
 async function handleUser(user) {
@@ -81,6 +83,12 @@ async function handleUser(user) {
     userData.nickname = "Anonymous";
   }
   nicknameInput.placeholder = userData.nickname;
+
+  if (userData.dev) {
+    devDiv.style.display = "flex";
+  } else {
+    devDiv.style.display = "none";
+  }
 }
 
 async function displayMessages() {
