@@ -11,6 +11,7 @@ import {
   triggerUpdate,
   getMessages,
   deleteMessage,
+  parseMessageContent,
 } from "./firebase-backend.js";
 
 const signedInDiv = document.getElementById("signedIn");
@@ -90,11 +91,13 @@ async function displayMessages() {
   const userDataMap = {};
   await Promise.all(
     authorIds.map(async (uid) => {
-      const dbNickname = (await getUserData(uid))?.nickname || "Anonymous";
+      const userData = (await getUserData(uid)) || { nickname: "Anonymous" };
       const cachedNickname = nicknameCache[uid];
 
-      if (cachedNickname !== dbNickname) nicknameCache[uid] = dbNickname;
-      userDataMap[uid] = dbNickname;
+      if (cachedNickname !== userData.nickname) {
+        nicknameCache[uid] = userData.nickname;
+      }
+      userDataMap[uid] = userData;
     })
   );
 
@@ -117,7 +120,7 @@ async function displayMessages() {
         })()
       : "";
 
-    const nickname = userDataMap[message.authorid] || "Anonymous";
+    const nickname = userDataMap[message.authorid].nickname || "Anonymous";
 
     const newMessageDiv = document.createElement("div");
     newMessageDiv.classList.add("message");
@@ -128,18 +131,13 @@ async function displayMessages() {
     const messageAuthor = document.createElement("div");
     messageAuthor.classList.add("message-author");
     messageAuthor.textContent = nickname;
-    messageAuthor.dataset.authorid = message.authorid;
-    messageAuthor.dataset.nickname = nickname;
 
     const messageSubheader = document.createElement("div");
     messageSubheader.classList.add("message-subheader");
 
     const messageTimestamp = document.createElement("div");
     messageTimestamp.classList.add("message-timestamp");
-    messageTimestamp.textContent = timestampStr;
-    if (timestampDate) {
-      messageTimestamp.dataset.timestamp = timestampDate.toISOString();
-    }
+    messageTimestamp.textContent = timestampStr ? timestampStr : "Soon-ish";
 
     const messageActions = document.createElement("div");
     messageActions.classList.add("message-actions");
@@ -148,10 +146,10 @@ async function displayMessages() {
       const deleteMessageButton = document.createElement("button");
       deleteMessageButton.classList.add("message-delete-button");
       deleteMessageButton.textContent = "Delete";
+
       deleteMessageButton.addEventListener("click", async () => {
         deleteMessageButton.disabled = true;
         await deleteMessage(message.id);
-        deleteMessageButton.disabled = false;
       });
 
       messageActions.appendChild(deleteMessageButton);
@@ -159,7 +157,7 @@ async function displayMessages() {
 
     const messageContent = document.createElement("div");
     messageContent.classList.add("message-content");
-    messageContent.textContent = message.content;
+    messageContent.innerHTML = parseMessageContent(message, userDataMap);
 
     messageSubheader.appendChild(messageTimestamp);
     messageSubheader.appendChild(messageActions);
@@ -176,45 +174,6 @@ async function displayMessages() {
   if (isAtBottom) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
-
-  async function correct() {
-    const authorEls = document.querySelectorAll(".message-author");
-    await Promise.all(
-      Array.from(authorEls).map(async (el) => {
-        const uid = el.dataset.authorid;
-        const dbNickname = (await getUserData(uid))?.nickname || "Anonymous";
-        if (nicknameCache[uid] !== dbNickname) {
-          nicknameCache[uid] = dbNickname;
-        }
-        if (el.textContent !== dbNickname) {
-          el.textContent = dbNickname;
-        }
-      })
-    );
-
-    const timestampEls = document.querySelectorAll(".message-timestamp");
-    for (const el of timestampEls) {
-      const iso = el.dataset.timestamp;
-      if (!iso) continue;
-
-      const date = new Date(iso);
-      const formatted = (() => {
-        const hours = date.getHours().toString().padStart(2, "0");
-        const minutes = date.getMinutes().toString().padStart(2, "0");
-        const day = date.getDate().toString().padStart(2, "0");
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const year = date.getFullYear();
-
-        return `${hours}:${minutes} ${day}-${month}-${year}`;
-      })();
-
-      if (el.textContent !== formatted) {
-        el.textContent = formatted;
-      }
-    }
-  }
-
-  await correct();
 
   updating = false;
 }

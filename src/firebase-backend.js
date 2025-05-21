@@ -128,6 +128,17 @@ async function deleteMessage(id) {
   await deleteDoc(messageDocRef);
 }
 
+function parseMessageContent(message, userDataMap) {
+  let content = message.content;
+
+  content = content.replace(
+    /(?<!["\w])\$name(?!\w)/g,
+    userDataMap[message.authorid].nickname
+  );
+
+  return content;
+}
+
 export {
   signInWith,
   onAuthStateChange,
@@ -141,4 +152,5 @@ export {
   triggerUpdate,
   getMessages,
   deleteMessage,
+  parseMessageContent,
 };

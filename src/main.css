@@ -209,10 +209,10 @@ button {
 button:disabled {
   cursor: default;
   background-color: var(--button-disabled-colour);
-  color: var(--button-disabled-text-colour)
+  color: var(--button-disabled-text-colour);
 }
 
-@media screen and (max-width: 936px) {
+@media screen and (max-width: 1344px) {
   .grid {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 2fr;
