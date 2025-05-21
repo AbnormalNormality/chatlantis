@@ -131,10 +131,14 @@ async function deleteMessage(id) {
 function parseMessageContent(message, userDataMap) {
   let content = message.content;
 
-  const debugText = `Viewport width: ${window.innerWidth}px`;
-  content = content.replace(/\$debug/g, debugText);
-
   return content;
+}
+
+function parseSendContent(message) {
+  const debugText = `Viewport width: ${window.innerWidth}px`;
+  message = message.replace(/\$debug/g, debugText);
+
+  return message;
 }
 
 export {
@@ -151,4 +155,5 @@ export {
   getMessages,
   deleteMessage,
   parseMessageContent,
+  parseSendContent,
 };

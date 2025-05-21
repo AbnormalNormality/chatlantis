@@ -12,6 +12,7 @@ import {
   getMessages,
   deleteMessage,
   parseMessageContent,
+  parseSendContent,
 } from "./firebase-backend.js";
 
 const signedInDiv = document.getElementById("signedIn");
@@ -179,7 +180,8 @@ async function displayMessages() {
 }
 
 async function sendMessageFromInput() {
-  const content = messageInput.value.trim();
+  let content = messageInput.value.trim();
+  content = parseSendContent(content);
 
   if (!getUser() || !content || sending) return;
 
