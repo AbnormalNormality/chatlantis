@@ -129,9 +129,28 @@ async function displayMessages() {
     const messageHeader = document.createElement("div");
     messageHeader.classList.add("message-header");
 
+    const messageAuthorHeader = document.createElement("div");
+    messageAuthorHeader.classList.add("message-author-header");
+
     const messageAuthor = document.createElement("div");
     messageAuthor.classList.add("message-author");
     messageAuthor.textContent = nickname;
+
+    let tagContent = null;
+
+    if (userDataMap[message.authorid].dev) {
+      tagContent = "DEV";
+    } else if (userDataMap[message.authorid].tag) {
+      tagContent = userDataMap[message.authorid].tag;
+    }
+
+    let messageAuthorTag = null;
+
+    if (tagContent) {
+      messageAuthorTag = document.createElement("div");
+      messageAuthorTag.classList.add("message-author-tag");
+      messageAuthorTag.textContent = tagContent;
+    }
 
     const messageSubheader = document.createElement("div");
     messageSubheader.classList.add("message-subheader");
@@ -160,9 +179,13 @@ async function displayMessages() {
     messageContent.classList.add("message-content");
     messageContent.innerHTML = parseMessageContent(message, userDataMap);
 
+    messageAuthorHeader.appendChild(messageAuthor);
+    if (tagContent) {
+      messageAuthorHeader.appendChild(messageAuthorTag);
+    }
     messageSubheader.appendChild(messageTimestamp);
     messageSubheader.appendChild(messageActions);
-    messageHeader.appendChild(messageAuthor);
+    messageHeader.appendChild(messageAuthorHeader);
     messageHeader.appendChild(messageSubheader);
     newMessageDiv.appendChild(messageHeader);
     newMessageDiv.appendChild(messageContent);

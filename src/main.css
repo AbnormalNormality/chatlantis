@@ -21,6 +21,7 @@
     --button-colour: #555;
     --button-disabled-colour: #444;
     --message-colour: #666;
+    --message-actions-colour: #666;
 
     --text-colour: #eee;
     --placeholder-colour: #aaa;
@@ -184,6 +185,22 @@ body {
   height: 100%;
   align-items: center;
   justify-content: center;
+}
+
+.message-author-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.message-author-tag {
+  background-color: var(--button-colour);
+  border-radius: 5px;
+  padding: 2px 4px;
+  border: 1px solid var(--border-colour);
+  font-size: 0.8em;
 }
 
 input {
