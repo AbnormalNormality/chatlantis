@@ -11,6 +11,7 @@ import {
   doc,
   setDoc,
   getDocs,
+  deleteDoc,
 } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js";
 import {
   getAuth,
@@ -54,7 +55,7 @@ async function signOutUser() {
 }
 
 function listenMessages(callback) {
-  return onSnapshot(messagesQuery, (snapshot) => {
+  return onSnapshot(messagesQuery, () => {
     callback();
   });
 }
@@ -122,6 +123,11 @@ async function getMessages() {
   return messages;
 }
 
+async function deleteMessage(id) {
+  const messageDocRef = doc(db, "messages", id);
+  await deleteDoc(messageDocRef);
+}
+
 export {
   signInWith,
   onAuthStateChange,
@@ -134,4 +140,5 @@ export {
   listenToUpdateTrigger,
   triggerUpdate,
   getMessages,
+  deleteMessage,
 };

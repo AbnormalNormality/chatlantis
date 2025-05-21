@@ -10,6 +10,7 @@ import {
   listenToUpdateTrigger,
   triggerUpdate,
   getMessages,
+  deleteMessage,
 } from "./firebase-backend.js";
 
 const signedInDiv = document.getElementById("signedIn");
@@ -130,6 +131,9 @@ async function displayMessages() {
     messageAuthor.dataset.authorid = message.authorid;
     messageAuthor.dataset.nickname = nickname;
 
+    const messageSubheader = document.createElement("div");
+    messageSubheader.classList.add("message-subheader");
+
     const messageTimestamp = document.createElement("div");
     messageTimestamp.classList.add("message-timestamp");
     messageTimestamp.textContent = timestampStr;
@@ -137,12 +141,30 @@ async function displayMessages() {
       messageTimestamp.dataset.timestamp = timestampDate.toISOString();
     }
 
+    const messageActions = document.createElement("div");
+    messageActions.classList.add("message-actions");
+
+    if (message.authorid == getUser().uid || getUser().dev) {
+      const deleteMessageButton = document.createElement("button");
+      deleteMessageButton.classList.add("message-delete-button");
+      deleteMessageButton.textContent = "Delete";
+      deleteMessageButton.addEventListener("click", async () => {
+        deleteMessageButton.disabled = true;
+        await deleteMessage(message.id);
+        deleteMessageButton.disabled = false;
+      });
+
+      messageActions.appendChild(deleteMessageButton);
+    }
+
     const messageContent = document.createElement("div");
     messageContent.classList.add("message-content");
     messageContent.textContent = message.content;
 
+    messageSubheader.appendChild(messageTimestamp);
+    messageSubheader.appendChild(messageActions);
     messageHeader.appendChild(messageAuthor);
-    messageHeader.appendChild(messageTimestamp);
+    messageHeader.appendChild(messageSubheader);
     newMessageDiv.appendChild(messageHeader);
     newMessageDiv.appendChild(messageContent);
     fragment.appendChild(newMessageDiv);
@@ -229,13 +251,16 @@ async function setNicknameFromInput() {
   if (!user || !newName || renaming) return;
 
   renaming = true;
+  updateNicknameButton.disabled = true;
 
   await setUserData(user.uid, { nickname: newName });
   nicknameInput.placeholder = newName;
   nicknameInput.value = "";
-  await triggerUpdate();
 
   renaming = false;
+  updateNicknameButton.disabled = false;
+
+  await triggerUpdate();
 }
 
 nicknameInput.addEventListener("keydown", async (event) => {

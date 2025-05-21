@@ -4,12 +4,14 @@
   --messages-colour: #eee;
   --input-colour: #f0f0f0;
   --button-colour: #eee;
-  --button-disabled-colour: #eee;
+  --button-disabled-colour: #ddd;
   --message-colour: #f0f0f0;
+  --message-actions-colour: #eee;
 
   --text-colour: #000;
   --placeholder-colour: #aaa;
   --border-colour: #999;
+  --button-disabled-text-colour: #555;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -25,6 +27,7 @@
     --text-colour: #eee;
     --placeholder-colour: #aaa;
     --border-colour: #222;
+    --button-disabled-text-colour: #aaa;
   }
 }
 
@@ -160,6 +163,23 @@ body {
   font-size: 0.8em;
 }
 
+.message-subheader {
+  display: flex;
+  gap: 10px;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-actions {
+  display: flex;
+  background-color: var(--message-actions-colour);
+  border-radius: 10px;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
 input {
   background-color: var(--input-colour);
   border: 1px solid var(--border-colour);
@@ -189,6 +209,7 @@ button {
 button:disabled {
   cursor: default;
   background-color: var(--button-disabled-colour);
+  color: var(--button-disabled-text-colour)
 }
 
 @media screen and (max-width: 936px) {
