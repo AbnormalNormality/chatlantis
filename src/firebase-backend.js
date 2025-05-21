@@ -40,34 +40,17 @@ const messagesQuery = query(messagesCol, orderBy("timestamp"));
 const googleProvider = new GoogleAuthProvider();
 
 async function signInWith(method) {
-  if (method == "google") {
+  if (method === "google") {
     await signInWithPopup(auth, googleProvider);
   }
 }
 
-async function onAuthStateChange(callback) {
-  await onAuthStateChanged(auth, handleUser);
+function onAuthStateChange(callback) {
   return onAuthStateChanged(auth, callback);
 }
 
 async function signOutUser() {
   await signOut(auth);
-}
-
-function listenMessages(callback) {
-  return onSnapshot(messagesQuery, () => {
-    callback();
-  });
-}
-
-async function sendMessage(content) {
-  const user = getUser();
-
-  await addDoc(messagesCol, {
-    authorid: user.uid,
-    content: content,
-    timestamp: serverTimestamp(),
-  });
 }
 
 function getUser() {
@@ -83,77 +66,88 @@ async function setUserData(uid, newData) {
   await setDoc(doc(db, "users", uid), newData, { merge: true });
 }
 
+function listenMessages(callback) {
+  return onSnapshot(messagesQuery, () => {
+    callback();
+  });
+}
+
+async function sendMessage(content) {
+  const user = getUser();
+  if (!user) throw new Error("User not authenticated");
+
+  const docRef = await addDoc(messagesCol, {
+    authorid: user.uid,
+    content,
+    timestamp: serverTimestamp(),
+  });
+
+  const messageId = docRef.id;
+  const userMessages = user.messages ? [...user.messages] : [];
+  userMessages.push(messageId);
+
+  await setUserData(user.uid, { messages: userMessages });
+}
+
+async function getMessages() {
+  const snapshot = await getDocs(messagesQuery);
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    timestamp: doc.data().timestamp?.toDate(),
+  }));
+}
+
+async function deleteMessage(id) {
+  await deleteDoc(doc(db, "messages", id));
+}
+
 async function handleUser(user) {
   if (!user) return;
 
   const userData = (await getUserData(user.uid)) || {};
-
   if (!userData.nickname) {
     userData.nickname = "Anonymous";
   }
 
-  setUserData(user.uid, userData);
+  await setUserData(user.uid, userData);
 }
 
 function listenToUpdateTrigger(callback) {
-  async function fetchMessagesAndRunCallback() {
-    callback();
-  }
-
   const updateDocRef = doc(db, "dev", "update");
   return onSnapshot(updateDocRef, () => {
-    fetchMessagesAndRunCallback();
+    callback();
   });
 }
 
 async function triggerUpdate() {
   const updateDocRef = doc(db, "dev", "update");
-  await setDoc(updateDocRef, {
-    updatedAt: serverTimestamp(),
-  });
-}
-
-async function getMessages() {
-  const snapshot = await getDocs(messagesQuery);
-  const messages = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-    timestamp: doc.data().timestamp?.toDate(),
-  }));
-  return messages;
-}
-
-async function deleteMessage(id) {
-  const messageDocRef = doc(db, "messages", id);
-  await deleteDoc(messageDocRef);
+  await setDoc(updateDocRef, { updatedAt: serverTimestamp() });
 }
 
 function parseMessageContent(message, userDataMap) {
-  let content = message.content;
-
-  return content;
+  return message.content;
 }
 
 function parseSendContent(message) {
   const debugText = `Viewport width: ${window.innerWidth}px`;
-  message = message.replace(/\$debug/g, debugText);
-
-  return message;
+  return message.replace(/\$debug/g, debugText);
 }
 
 export {
   signInWith,
   onAuthStateChange,
   signOutUser,
-  listenMessages,
-  sendMessage,
   getUser,
   getUserData,
   setUserData,
-  listenToUpdateTrigger,
-  triggerUpdate,
+  handleUser,
+  listenMessages,
+  sendMessage,
   getMessages,
   deleteMessage,
+  listenToUpdateTrigger,
+  triggerUpdate,
   parseMessageContent,
   parseSendContent,
 };

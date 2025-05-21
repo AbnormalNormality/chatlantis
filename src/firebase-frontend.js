@@ -26,22 +26,33 @@ const updateNicknameButton = document.getElementById("updateNickname");
 
 const messageInput = document.getElementById("messageInput");
 const nicknameInput = document.getElementById("nicknameInput");
+const messageNotifications = document.getElementById("messageNotifications");
 
 let sending = false;
 let renaming = false;
 let updating = false;
 const nicknameCache = {};
 
-siGoogleButton.addEventListener("click", async () => {
-  siGoogleButton.disabled = true;
-  await signInWith("google");
-  siGoogleButton.disabled = false;
+let enableNotifications = localStorage.getItem("notificationsEnabled");
+
+if (enableNotifications !== null) {
+  messageNotifications.checked = enableNotifications === "true";
+} else {
+  localStorage.setItem("notificationsEnabled", messageNotifications.checked);
+}
+
+messageNotifications.addEventListener("change", () => {
+  localStorage.setItem("notificationsEnabled", messageNotifications.checked);
 });
-signOutButton.addEventListener("click", async () => {
-  signOutButton.disabled = true;
-  await signOutUser();
-  signOutButton.disabled = false;
-});
+
+function notify(content) {
+  if (
+    Notification.permission === "granted" &&
+    localStorage.getItem("notificationsEnabled") === "true"
+  ) {
+    new Notification(content);
+  }
+}
 
 function signedIn() {
   signedInDiv.style.display = "flex";
@@ -66,9 +77,8 @@ async function handleUser(user) {
   signedIn();
 
   const userData = await getUserData(user.uid);
-
   if (!userData.nickname) {
-    userData.nickname == "Anonymous";
+    userData.nickname = "Anonymous";
   }
   nicknameInput.placeholder = userData.nickname;
 }
@@ -137,7 +147,6 @@ async function displayMessages() {
     messageAuthor.textContent = nickname;
 
     let tagContent = null;
-
     if (userDataMap[message.authorid].dev) {
       tagContent = "DEV";
     } else if (userDataMap[message.authorid].tag) {
@@ -145,7 +154,6 @@ async function displayMessages() {
     }
 
     let messageAuthorTag = null;
-
     if (tagContent) {
       messageAuthorTag = document.createElement("div");
       messageAuthorTag.classList.add("message-author-tag");
@@ -157,14 +165,22 @@ async function displayMessages() {
 
     const messageTimestamp = document.createElement("div");
     messageTimestamp.classList.add("message-timestamp");
-    messageTimestamp.textContent = timestampStr ? timestampStr : "Soon-ish";
+    messageTimestamp.textContent = timestampStr || "Soon-ish";
 
     const messageActions = document.createElement("div");
     messageActions.classList.add("message-actions");
 
-    if (message.authorid == getUser().uid || getUser().dev) {
+    if (message.authorid === getUser().uid || userDataMap[getUser().uid].dev) {
       const deleteMessageButton = document.createElement("button");
       deleteMessageButton.classList.add("message-delete-button");
+
+      if (
+        !(message.authorid === getUser().uid) &&
+        userDataMap[getUser().uid].dev
+      ) {
+        deleteMessageButton.classList.add("dev-button");
+      }
+
       deleteMessageButton.textContent = "Delete";
 
       deleteMessageButton.addEventListener("click", async () => {
@@ -180,13 +196,12 @@ async function displayMessages() {
     messageContent.innerHTML = parseMessageContent(message, userDataMap);
 
     messageAuthorHeader.appendChild(messageAuthor);
-    if (tagContent) {
-      messageAuthorHeader.appendChild(messageAuthorTag);
-    }
+    if (tagContent) messageAuthorHeader.appendChild(messageAuthorTag);
     messageSubheader.appendChild(messageTimestamp);
     messageSubheader.appendChild(messageActions);
     messageHeader.appendChild(messageAuthorHeader);
     messageHeader.appendChild(messageSubheader);
+
     newMessageDiv.appendChild(messageHeader);
     newMessageDiv.appendChild(messageContent);
     fragment.appendChild(newMessageDiv);
@@ -194,6 +209,14 @@ async function displayMessages() {
 
   messagesDiv.textContent = "";
   messagesDiv.appendChild(fragment);
+
+  const lastStoredMessage = localStorage.getItem("lastMessage");
+  const lastMessage = sortedMessages[sortedMessages.length - 1];
+
+  if (lastMessage && lastStoredMessage !== lastMessage.id) {
+    notify(`${userDataMap[lastMessage.authorid].nickname} sent a message!`);
+    localStorage.setItem("lastMessage", lastMessage.id);
+  }
 
   if (isAtBottom) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -217,10 +240,7 @@ async function sendMessageFromInput() {
   sending = false;
 }
 
-sendMessageButton.addEventListener("click", async () => {
-  await sendMessageFromInput();
-});
-
+sendMessageButton.addEventListener("click", sendMessageFromInput);
 messageInput.addEventListener("keydown", async (event) => {
   if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
@@ -254,15 +274,24 @@ nicknameInput.addEventListener("keydown", async (event) => {
   }
 });
 
+updateNicknameButton.addEventListener("click", setNicknameFromInput);
+
+siGoogleButton.addEventListener("click", async () => {
+  siGoogleButton.disabled = true;
+  await signInWith("google");
+  siGoogleButton.disabled = false;
+});
+
+signOutButton.addEventListener("click", async () => {
+  signOutButton.disabled = true;
+  await signOutUser();
+  signOutButton.disabled = false;
+});
+
 async function forcedUpdate() {
   await displayMessages();
 }
 
-updateNicknameButton.addEventListener("click", async () => {
-  await setNicknameFromInput();
-});
-
 listenToUpdateTrigger(forcedUpdate);
 listenMessages(displayMessages);
-
 onAuthStateChange(handleUser);

@@ -37,9 +37,12 @@
       </div>
 
       <div class="container" id="userContainer">
-        <div id="persistent">
-          <button id="forceUpdate">Force update</button>
-        </div>
+        <button id="forceUpdate">Force update</button>
+        <button id="enableNotifications" style="display: none">
+          Enable Notifications
+        </button>
+
+        <hr />
 
         <div id="signedOut">
           <button id="signInGoogle">Sign in with Google</button>
@@ -48,9 +51,14 @@
         <div id="signedIn">
           <button id="signOut">Sign out</button>
 
-          <div id="nicknameWrapper">
+          <div class="input-wrapper">
             <input type="text" id="nicknameInput" />
             <button id="updateNickname">Change name</button>
+          </div>
+
+          <div class="input-wrapper">
+            <div>Message notifications</div>
+            <input type="checkbox" id="messageNotifications" />
           </div>
         </div>
       </div>

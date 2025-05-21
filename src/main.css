@@ -11,6 +11,12 @@
   --placeholder-colour: #aaa;
   --border-colour: #999;
   --button-disabled-text-colour: #555;
+
+  --dev-button-colour: #ff5c8a;
+  --dev-button-border-colour: #cc3366;
+  --dev-button-text-colour: #000;
+  --dev-button-disabled-colour: #ffc2d4;
+  --dev-button-disabled-text-colour: #666;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,14 +33,21 @@
     --placeholder-colour: #aaa;
     --border-colour: #222;
     --button-disabled-text-colour: #aaa;
+
+    --dev-button-colour: #d6336c;
+    --dev-button-border-colour: #a61e4d;
+    --dev-button-text-colour: #fff;
+    --dev-button-disabled-colour: #552233;
+    --dev-button-disabled-text-colour: #aaa;
   }
 }
 
 * {
-  color: var(--text-colour);
   box-sizing: border-box;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
   overflow-wrap: break-word;
+
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  color: var(--text-colour);
 }
 
 body {
@@ -49,39 +62,41 @@ body {
 }
 
 #messagesContainer {
-  grid-column: 1;
-  grid-row: 1 / span 2;
-
   display: grid;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: column;
   grid-template-columns: 1fr;
   grid-template-rows: 15fr 1fr;
   gap: 5%;
+
+  grid-column: 1;
+  grid-row: 1 / span 2;
+
+  justify-content: space-between;
+  align-items: center;
 }
 
 #messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
   height: 100%;
-  overflow-y: auto;
   width: 100%;
+
   grid-column: 1;
   grid-row: 1;
 
-  display: flex;
-  gap: 10px;
-  flex-direction: column;
-
+  overflow-y: auto;
   border-radius: 10px;
 }
 
 #inputContainer {
-  height: 100%;
-  width: 100%;
-  grid-row: 2;
-
   display: flex;
   justify-content: space-between;
+
+  height: 100%;
+  width: 100%;
+
+  grid-row: 2;
 }
 
 #messageInput {
@@ -93,29 +108,21 @@ body {
 }
 
 #userContainer {
-  grid-column: 2;
-  grid-row: 1;
-
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  grid-column: 2;
+  grid-row: 1;
 }
 
 #signedIn,
 #signedOut {
-  height: 100%;
-
   display: none;
   flex-direction: column;
   gap: 10px;
-}
 
-#nicknameWrapper {
-  width: 100%;
-  height: 10%;
-
-  display: flex;
-  justify-content: space-between;
+  height: 100%;
 }
 
 #updateNickname {
@@ -132,13 +139,13 @@ body {
 }
 
 .grid {
-  height: 80vh;
-  width: 80vw;
-
   display: grid;
   grid-template-columns: 2fr 1fr;
   grid-template-rows: 2fr 1fr;
   gap: 5%;
+
+  height: 80vh;
+  width: 80vw;
 }
 
 .container {
@@ -149,11 +156,13 @@ body {
 }
 
 .message {
-  background-color: var(--message-colour);
   display: flex;
-  border-radius: 10px;
   flex-direction: column;
+
   padding: 10px;
+
+  background-color: var(--message-colour);
+  border-radius: 10px;
 }
 
 .message-header {
@@ -173,6 +182,7 @@ body {
 .message-subheader {
   display: flex;
   gap: 10px;
+
   height: 100%;
   align-items: center;
   justify-content: center;
@@ -180,36 +190,62 @@ body {
 
 .message-actions {
   display: flex;
-  background-color: var(--message-actions-colour);
-  border-radius: 10px;
+
   height: 100%;
   align-items: center;
   justify-content: center;
+
+  background-color: var(--message-actions-colour);
+  border-radius: 10px;
 }
 
 .message-author-header {
   display: flex;
   gap: 10px;
+
+  height: 100%;
   align-items: center;
   justify-content: center;
-  height: 100%;
 }
 
 .message-author-tag {
   background-color: var(--button-colour);
   border-radius: 5px;
-  padding: 2px 4px;
   border: 1px solid var(--border-colour);
+
+  padding: 2px 4px;
+
   font-size: 0.8em;
+}
+
+.dev-button {
+  background-color: var(--dev-button-colour);
+  border: 1px solid var(--dev-button-border-colour);
+  color: var(--dev-button-text-colour);
+}
+
+.dev-button:disabled {
+  background-color: var(--dev-button-disabled-colour);
+  color: var(--dev-button-disabled-text-colour);
+}
+
+.input-wrapper {
+  display: flex;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 10%;
 }
 
 input {
   background-color: var(--input-colour);
   border: 1px solid var(--border-colour);
   border-radius: 5px;
-  padding: 0 5px;
+
   display: flex;
   min-height: 10%;
+
+  padding: 0 5px;
 }
 
 input::placeholder {
@@ -225,6 +261,7 @@ button {
   background-color: var(--button-colour);
   border: 1px solid var(--border-colour);
   border-radius: 5px;
+
   cursor: pointer;
   padding: 2px 4px;
 }
@@ -235,8 +272,17 @@ button:disabled {
   color: var(--button-disabled-text-colour);
 }
 
+hr {
+  width: 85%;
+  height: 2px;
+
+  border: none;
+  background-color: var(--border-colour);
+}
+
 @media screen and (max-width: 980px) {
   .grid {
+    display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 2fr;
   }
