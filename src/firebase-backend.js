@@ -131,10 +131,8 @@ async function deleteMessage(id) {
 function parseMessageContent(message, userDataMap) {
   let content = message.content;
 
-  content = content.replace(
-    /(?<!["\w])\$name(?!\w)/g,
-    userDataMap[message.authorid].nickname
-  );
+  const debugText = `Viewport width: ${window.innerWidth}px`;
+  content = content.replace(/\$debug/g, debugText);
 
   return content;
 }
